@@ -1,0 +1,26 @@
+body{
+    width: 960px;
+    margin: 0 auto;
+}
+h1{
+    text-align: center;
+}
+#lienzo{
+    background-image: url("imagenes/bosque.jpg");  
+    
+    
+}
+#boton{
+    background-color: rgb(35, 27, 141);
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    font-weight: bolder;
+    padding: 3px;
+    border: solid 2px black;
+}
+#boton:hover{ /* Estilo que se activa al pasar el puntero sobre el boton */
+    /* background-color: lightcoral; */
+    font-size: 22px;
+ /* border: groove 4px red; */
+}
