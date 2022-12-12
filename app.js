@@ -1,6 +1,9 @@
 function app() {
 
     canvas = document.getElementById("lienzo");
+
+    ctx = canvas.getContext("2d");
+
     
     /* Variables */
     var g=0;
@@ -9,8 +12,8 @@ function app() {
     var canvas;
     var palabra;
     var letras = "QWERTYUIOPASDFGHJKLÑZXCVBNM";
-    var colorTecla = "#585858";
-    var colorMargen = "red";
+    var colorTecla = "#0A2F5C";
+    var colorMargen = "white";
     var inicioX = 250;
     var inicioY = 350;
     var lon = 35;
@@ -27,23 +30,27 @@ function app() {
     /* Variables de control */
     var aciertos = 0;
     var errores = 0;
+    var intentosRestantes = 5;
+
 
     /* Palabras */
-    palabras_array.push("LEON");
-    palabras_array.push("CABALLO");
-    palabras_array.push("PERRO");
-    palabras_array.push("GATO");
-    palabras_array.push("LAGARTIJA");
-    palabras_array.push("RINOCERONTE");
-    palabras_array.push("TIBURON");
-    palabras_array.push("CARACOL");
-    palabras_array.push("ALACRAN");
-    palabras_array.push("ARAÑA");
-    palabras_array.push("CHAPULIN");
-    palabras_array.push("AVESTRUZ");
-    palabras_array.push("OCELOTE");
-    palabras_array.push("MUSARAÑA");
-    palabras_array.push("AGUILA");
+    palabras_array.push("GUERRERO");
+    palabras_array.push("CDMX");
+    palabras_array.push("GUADALAJARA");
+    palabras_array.push("DURANGO");
+    palabras_array.push("GUANAJUATO");
+    palabras_array.push("MICHOACAN");
+    palabras_array.push("SINALOA");
+    palabras_array.push("CHIHUAHUA");
+    palabras_array.push("PUEBLA");
+    palabras_array.push("TLAXCALA");
+    palabras_array.push("OAXACA");
+    palabras_array.push("QUERETARO");
+    palabras_array.push("EDMX");
+    palabras_array.push("MONTERREY");
+    palabras_array.push("YUCATAN");
+    palabras_array.push("TIJUANA");
+
 
     /* Objetos */
     function Tecla(x, y, ancho, alto, letra) {
@@ -74,10 +81,11 @@ function app() {
             ctx.fillStyle = colorTecla;
             ctx.strokeStyle = colorMargen;
             ctx.fillRect(this.x, this.y, this.ancho, this.alto);
-            ctx.strokeRect(this.x, this.y, this.ancho, this.alto);
+            ctx.roundRect(this.x, this.y, this.ancho, this.alto, 10);
+            ctx.stroke();
 
             ctx.fillStyle = "white";
-            ctx.font = "bold 20px courier";
+            ctx.font = "bold 20px Sansita ";
             ctx.fillText(this.letra, this.x + this.ancho / 2 - 5, this.y + this.alto / 2 + 5);
         },
 
@@ -86,14 +94,34 @@ function app() {
             var w = this.ancho;
             var h = this.alto;
             ctx.fillStyle = "black";
-            ctx.font = "bold 40px Courier";
+            ctx.font = "bold 40px Sansita ";
             ctx.fillText(this.letra, this.x + w / 2 - 12, this.y + h / 2 + 14);
         },
+        // cajas blancas
         dibujaCajaLetra: function () {
             ctx.fillStyle = "white";
             ctx.strokeStyle = "black";
             ctx.fillRect(this.x, this.y, this.ancho, this.alto);
             ctx.strokeRect(this.x, this.y, this.ancho, this.alto);
+        },
+
+        informacion: function(){
+
+            ctx.font = "bold 30px Sansita ";
+            ctx.fillStyle = "#000";
+
+            ctx.fillText(g, 205, 60);
+            ctx.fillText(p, 415, 60);
+            var r=g+p
+
+            ctx.fillText(r, 830, 56);
+
+            ctx.fillStyle = "#FFFFFF";
+            ctx.font = "bold 20px Sansita ";
+            ctx.fillText("REINICIAR",50,460);
+            ctx.strokeStyle = "#FFF";
+            ctx.strokeRect(45, 435, 120,35);
+
         },
 
         /* Distribuir nuestro teclado con sus letras respectivas al acomodo de nuestro array */
@@ -104,6 +132,7 @@ function app() {
             var miLetra;
             var x = inicioX;
             var y = inicioY;
+
             for (var i = 0; i < letras.length; i++) {
                 letra = letras.substr(i, 1);
                 miLetra = new Tecla(x, y, lon, lon, letra);
@@ -151,6 +180,8 @@ function app() {
         horca: function (errores) {
             var imagen = new Image();
             imagen.src = "imagenes/ilustrado" + errores + ".png";
+            juegoAhorcado.informacion();
+
             imagen.onload = function () {
                 ctx.drawImage(imagen, 460, 30, 230, 260);
             }
@@ -177,8 +208,9 @@ function app() {
             var x = e.offsetX;
             var y = e.offsetY;
 
-            var coordenadas = document.getElementById("cordenadas");
-            coordenadas.innerHTML = "cordenadas:  X: " + x + " Y: " + y;
+            // MUESTRA COORDENADAS EN PANTALLA
+            // var coordenadas = document.getElementById("cordenadas");
+            // coordenadas.innerHTML = "cordenadas:  X: " + x + " Y: " + y;
 
             var pos = juegoAhorcado.ajusta(e.clientX, e.clientY);
             var x = pos.x;
@@ -205,6 +237,8 @@ function app() {
                 }
                 if (bandera == false) { /* Si falla aumenta los errores y checa si perdio para mandar a la funcion gameover */
                     errores++;
+                    intentosRestantes-=1;
+
                     juegoAhorcado.horca(errores);
                     if (errores == 5) juegoAhorcado.gameOver(errores);
                 }
@@ -214,19 +248,51 @@ function app() {
                 /* checa si se gano y manda a la funcion gameover */
                 if (aciertos == palabra.length) juegoAhorcado.gameOver(errores);
             }
+        // funcion para volver a jugar
+            if(x > 40 && x < 163 && y > 440 && y < 464){
+                window.location.reload();
+            }
+            // coordenadas del botón "Siguiente palabra"
+            if(x > 750 && x < 935 && y > 440 && y < 465){
+                juegoAhorcado.palabraSiguiente();
+            }
         },
 
+
+        palabraSiguiente: function (){
+            intentosRestantes = 5;
+            aciertos = 0;
+            errores = 0;
+            inicioX = 250;
+            inicioY = 350;
+            lon = 35;
+            margen = 20;
+            palabra = "";
+            letras_array= new Array();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            juegoAhorcado.play();
+        },
+        
         /* Borramos las teclas y la palabra con sus cajas y mandamos msj segun el caso si se gano o se perdio */
         gameOver: function (errores) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "black";
 
-            ctx.font = "bold 50px Courier";
+            ctx.font = "bold 50px Sansita ";
             if (errores < 5) {
-               g=g+1;
-               ctx.fillText(g, 245, 60);
-                // ctx.fillText("Muy bien, la palabra es: ", 110, 300);
+            //    g=g+1;
+            //    ctx.fillText(g, 205, 60);
+            //    ctx.fillText(p, 410, 60);
+
+            ctx.fillStyle = "#FFFFFF";
+            ctx.font = "bold 20px Sansita ";
+            ctx.fillText("SEGUIR JUGANDO",760,460);
+            ctx.fillStyle = "#000";
+            ctx.strokeStyle = "#FFF";
+            ctx.strokeRect(755, 440, 190, 30);
+            
                 audio.play();
+                g=g+1;//aqui agrega el conteo de juego
 
                 Swal.fire({
                     title: '¡GANASTE!',
@@ -249,11 +315,26 @@ function app() {
                     `
                   })
 
+            //   PALABRA EN COLOR VERDE
+            ctx.font = "bold 80px Sansita ";
+            ctx.fillStyle = "#fdf89d"
+            lon = (canvas.width - (palabra.length * 48)) / 2;
+            ctx.fillText(palabra, lon, 380);
+
             } else {
                 p=p+1;
-                ctx.fillText(p, 425, 60);
+                // ctx.fillText(p, 410, 60);
+                // ctx.fillText(g, 205, 60);
                 // ctx.fillText("Lo sentimos, la palabra era: ", 110, 300);
+                ctx.fillStyle = "#FFFFFF";
+                ctx.font = "bold 20px Sansita ";
+                ctx.fillText("SEGUIR JUGANDO",760,460);
+                ctx.fillStyle = "#000";
+                ctx.strokeStyle = "#FFF";
+                ctx.strokeRect(755, 440, 190, 30);
+
                 audioPerdido.play()
+
                 Swal.fire({
                     title: '¡PERDISTE!',
                     width: 600,
@@ -270,29 +351,50 @@ function app() {
                       no-repeat
                     `
                     });
+
+            //   PALABRA EN COLOR VERDE
+            ctx.font = "bold 80px Sansita ";
+            ctx.fillStyle = "red"
+            lon = (canvas.width - (palabra.length * 48)) / 2;
+            ctx.fillText(palabra, lon, 380);
                 
             }
 
-            ctx.font = "bold 80px Courier";
-            lon = (canvas.width - (palabra.length * 48)) / 2;
-            ctx.fillText(palabra, lon, 380);
+            // ctx.font = "bold 80px Sansita ";
+            // ctx.fillStyle = "red"
+            // lon = (canvas.width - (palabra.length * 48)) / 2;
+            // ctx.fillText(palabra, lon, 380);
+            ctx.font = "bold 30px Sansita ";
             juegoAhorcado.horca(errores);
-        }
-    }
+        },
 
-    if (canvas && canvas.getContext) {
-
-        ctx = canvas.getContext("2d");
-        if (ctx) {
-
+        play: function () {
+            // Detectar si se a cargado nuestro contexco en el canvas, iniciamos las funciones necesarias para jugar o se le manda msj de error segun sea el caso 
+            ctx.clearRect(0, 0, canvas.width, canvas.height);   
+                //     ctx = canvas.getContext("2d"); 
             juegoAhorcado.teclado();
-            juegoAhorcado.pintaPalabra();
-            juegoAhorcado.horca(errores);
-            canvas.addEventListener("click", juegoAhorcado.selecciona, false);
-        } else {
-            alert("Error al cargar el contexto!");
+                juegoAhorcado.pintaPalabra();
+                juegoAhorcado.horca(errores);
+                canvas.addEventListener("click", juegoAhorcado.selecciona, false);
         }
     }
+
+    juegoAhorcado.play(true);
+
+
+    // if (canvas && canvas.getContext) {
+
+    //     ctx = canvas.getContext("2d");
+    //     if (ctx) {
+
+    //         juegoAhorcado.teclado();
+    //         juegoAhorcado.pintaPalabra();
+    //         juegoAhorcado.horca(errores);
+    //         canvas.addEventListener("click", juegoAhorcado.selecciona, false);
+    //     } else {
+    //         alert("Error al cargar el contexto!");
+    //     }
+    // }
 
 }
 
